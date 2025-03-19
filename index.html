@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop Onboarding Wizard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body { background-color: #f8f9fa; }
+        .wizard-container { max-width: 800px; margin: 50px auto; padding: 20px; background: white; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); border: 2px solid #ddd; }
+        .step { display: none; }
+        .step.active { display: block; }
+        .theme-card { border: 2px solid #ddd; padding: 15px; cursor: pointer; text-align: center; border-radius: 8px; position: relative; }
+        .theme-card img { width: 100%; border-radius: 8px; }
+        .apply-btn { position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); }
+        .theme-card:hover, .theme-card.selected { border-color: orange; background-color: #fff8e1; }
+        .summary-box { border: 1px solid #ddd; padding: 10px; margin-top: 10px; background: #e9ecef; border-radius: 8px; }
+        .input-group { margin-bottom: 15px; }
+        .form-container { display: flex; justify-content: space-between; }
+        .form-container .input-section, .form-container .preview-section { width: 48%; }
+        .preview-section { border-left: 2px solid #ddd; padding-left: 15px; }
+        .preview-section p { color: #007bff; font-weight: bold; }
+        .preview-section { border: 2px solid #007bff; padding: 15px; border-radius: 8px; }
+        .preview-section img { max-width: 100%; border-radius: 8px; margin-top: 10px; display: none; }
+    </style>
+</head>
+<body>
+    <div class="wizard-container">
+        <h2 class="text-center">Shop Onboarding Wizard</h2>
+        <div class="step active" id="step1">
+            <h4>Select a Theme</h4>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="theme-card" data-theme="Theme 1">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTz4W_6mnT1p917gYZv1kc5-1izdzGVSgnAYQ&s" alt="Theme 1">
+                        <button class="btn btn-primary apply-btn">Apply</button>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="theme-card" data-theme="Theme 2">
+                        <img src="https://files.cdn.printful.com/o/upload/bfl-image/72/18035_l_animal-print-tote-bag" alt="Theme 2">
+                        <button class="btn btn-primary apply-btn">Apply</button>
+                    </div>
+                </div>
+            </div>
+            <button class="btn btn-primary mt-3 next">Next</button>
+        </div>
+
+        <div class="step" id="step2">
+            <h4>Add Product Type & Category</h4>
+            <label>Product Type</label>
+            <input type="text" class="form-control mb-2">
+            <label>Category (Optional)</label>
+            <input type="text" class="form-control mb-2">
+            <label>Subcategory (Optional)</label>
+            <input type="text" class="form-control mb-2">
+            <button class="btn btn-secondary prev">Back</button>
+            <button class="btn btn-primary next">Next</button>
+        </div>
+
+        <div class="step" id="step3">
+            <h4>Add a New Product</h4>
+            <div class="form-container">
+                <div class="input-section">
+                    <label>Product Name</label>
+                    <input type="text" class="form-control" id="productName">
+                    <label>Product Description</label>
+                    <textarea class="form-control" id="productDescription"></textarea>
+                    <label>Upload Image</label>
+                    <input type="file" class="form-control" id="productImage">
+                    <label><input type="checkbox" id="skuCheck"> This product has a SKU code</label>
+                    <h5>Pricing Details</h5>
+                    <label><input type="checkbox" id="gstIncluded"> Price inclusive of GST</label>
+                    <label>Net Price</label>
+                    <input type="number" class="form-control" id="netPrice">
+                    <label>List Price</label>
+                    <input type="number" class="form-control" id="listPrice">
+                    <label>Discount %</label>
+                    <input type="number" class="form-control" id="discount">
+                    <label>GST Rate</label>
+                    <input type="number" class="form-control" id="gstRate">
+                    <label>Shipping Charges</label>
+                    <input type="number" class="form-control" id="shipping">
+                    <label>Stock Level</label>
+                    <input type="number" class="form-control" id="stock">
+                    <button class="btn btn-secondary prev">Back</button>
+                </div>
+                <div class="preview-section">
+                    <h5>Product Preview</h5>
+                    <p><strong>Name:</strong> <span id="previewName"></span></p>
+                    <p><strong>Description:</strong> <span id="previewDescription"></span></p>
+                    <p><strong>Net Price:</strong> <span id="previewNetPrice"></span></p>
+                    <p><strong>List Price:</strong> <span id="previewListPrice"></span></p>
+                    <p><strong>Discount:</strong> <span id="previewDiscount"></span>%</p>
+                    <p><strong>GST Rate:</strong> <span id="previewGstRate"></span>%</p>
+                    <p><strong>Shipping:</strong> <span id="previewShipping"></span></p>
+                    <p><strong>Stock Level:</strong> <span id="previewStock"></span></p>
+                    <img id="previewImage" alt="Product Image">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function(){
+            let currentStep = 0;
+            let steps = $(".step");
+            
+            function showStep(index) {
+                steps.removeClass("active");
+                $(steps[index]).addClass("active");
+            }
+            
+            $(".next").click(function(){
+                if (currentStep < steps.length - 1) {
+                    currentStep++;
+                    showStep(currentStep);
+                }
+            });
+            
+            $(".prev").click(function(){
+                if (currentStep > 0) {
+                    currentStep--;
+                    showStep(currentStep);
+                }
+            });
+            
+            $(".apply-btn").click(function(){
+                $(".theme-card").removeClass("selected");
+                $(this).closest(".theme-card").addClass("selected");
+            });
+
+            $("#productImage").change(function(event) {
+                let reader = new FileReader();
+                reader.onload = function(e) {
+                    $("#previewImage").attr("src", e.target.result).show();
+                }
+                reader.readAsDataURL(event.target.files[0]);
+            });
+        });
+    </script>
+</body>
+</html>
